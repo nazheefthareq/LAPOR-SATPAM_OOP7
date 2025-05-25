@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package LaporSatpam;
+import ConnectionDB.DatabaseConn;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableModel;
 import LaporSatpam.TambahTamuFrame;
@@ -20,6 +21,7 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+        DatabaseConn.connectDB();
         
          //menampilkan data Tamu pada Tabel Data Tamu di Main Frame
         this.tamu = new DefaultTableModel();

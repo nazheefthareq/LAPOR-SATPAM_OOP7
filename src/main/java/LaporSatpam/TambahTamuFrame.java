@@ -3,9 +3,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package LaporSatpam;
+
+import ConnectionDB.DatabaseConn;
+import static ConnectionDB.DatabaseConn.conn;
 import javax.swing.*;
 import java.awt.event.*;
 import LaporSatpam.HitungMundur;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -21,6 +26,7 @@ public class TambahTamuFrame extends javax.swing.JFrame {
      */
     public TambahTamuFrame() {
         initComponents();
+        DatabaseConn.connectDB();
     }
     
     public TambahTamuFrame(DefaultTableModel tamu) {
@@ -63,6 +69,12 @@ public class TambahTamuFrame extends javax.swing.JFrame {
         labelNama.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         labelNama.setForeground(new java.awt.Color(255, 255, 255));
         labelNama.setText("Nama Tamu");
+
+        tfNamaTamu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfNamaTamuActionPerformed(evt);
+            }
+        });
 
         labelNopolTamu.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         labelNopolTamu.setForeground(new java.awt.Color(255, 255, 255));
@@ -169,13 +181,46 @@ public class TambahTamuFrame extends javax.swing.JFrame {
                 "Tolong Isi Semua Data!",
                 "Data Belum Terisi!",
                 JOptionPane.ERROR_MESSAGE);
-        } else {
-            Object[] rowData = { nama, nopol, tujuan, waktuDatang, durasi };
-            tableModel.addRow(rowData);
-            HitungMundur.mulaiCountdown(nama, nopol, durasi);
-            dispose(); // menutup frame TambahTamu setelah berhasil simpan
+        } 
+        try {
+            String sql = "INSERT INTO tamu (nama, nopol, tujuan, waktu_datang, durasi) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nama);
+            stmt.setString(2, nopol);
+            stmt.setString(3, tujuan);
+            stmt.setObject(4, waktuDatang); // pastikan tipe sesuai dengan kolom waktu_datang di DB
+            stmt.setInt(5, durasi);
+
+            int rowsInserted = stmt.executeUpdate();
+            if (rowsInserted > 0) {
+                JOptionPane.showMessageDialog(this,
+                    "Data tamu berhasil ditambahkan ke database.",
+                    "Sukses",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+                Object[] rowData = { nama, nopol, tujuan, waktuDatang, durasi };
+                tableModel.addRow(rowData);
+                HitungMundur.mulaiCountdown(nama, nopol, durasi);
+                dispose(); // menutup frame setelah simpan
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Gagal menambahkan data ke database.",
+                    "Gagal",
+                    JOptionPane.ERROR_MESSAGE);
             }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this,
+                "Terjadi kesalahan saat menyimpan ke database: " + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+
+        
     }//GEN-LAST:event_btnSimpanActionPerformed
+
+    private void tfNamaTamuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNamaTamuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfNamaTamuActionPerformed
 
     /**
      * @param args the command line arguments
