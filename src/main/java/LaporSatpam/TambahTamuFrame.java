@@ -3,8 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package LaporSatpam;
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.awt.event.*;
+import LaporSatpam.HitungMundur;
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  *
@@ -157,15 +160,19 @@ public class TambahTamuFrame extends javax.swing.JFrame {
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
         String nama = tfNamaTamu.getText();
         String nopol = tfNopolTamu.getText();
+         String tujuan = tfTujuanTamu.getText();
+         Object waktuDatang = spinnerDatang.getValue();
+         int durasi = (Integer) spinnerDurasi.getValue(); 
 
-        if (nama.isEmpty() || nopol.isEmpty()) {
+        if (nama.isEmpty() || nopol.isEmpty() || tujuan.isEmpty()) {
         JOptionPane.showMessageDialog(this,
                 "Tolong Isi Semua Data!",
                 "Data Belum Terisi!",
                 JOptionPane.ERROR_MESSAGE);
         } else {
-            Object[] rowData = { nama, nopol };
+            Object[] rowData = { nama, nopol, tujuan, waktuDatang, durasi };
             tableModel.addRow(rowData);
+            HitungMundur.mulaiCountdown(nama, nopol, durasi);
             dispose(); // menutup frame TambahTamu setelah berhasil simpan
             }
     }//GEN-LAST:event_btnSimpanActionPerformed

@@ -4,6 +4,9 @@
  */
 package LaporSatpam;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableModel;
+import LaporSatpam.TambahTamuFrame;
+
 
 /**
  *
@@ -19,8 +22,7 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         
          //menampilkan data Tamu pada Tabel Data Tamu di Main Frame
-        DefaultTableModel tamu = new DefaultTableModel();
-        this.tamu = tamu;
+        this.tamu = new DefaultTableModel();
         String[] kolom = {"Nama Tamu", "NOPOL Kendaraan", "Tujuan Tamu", "Waktu Kedatangan", "Durasi (Jam)"};
         tamu.setColumnIdentifiers(kolom);
         tableDataTamu.setModel(tamu);
