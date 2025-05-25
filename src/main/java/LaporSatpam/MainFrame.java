@@ -3,18 +3,35 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package LaporSatpam;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author USER
  */
 public class MainFrame extends javax.swing.JFrame {
+    private DefaultTableModel tamu;
 
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         initComponents();
+        
+         //menampilkan data Tamu pada Tabel Data Tamu di Main Frame
+        DefaultTableModel tamu = new DefaultTableModel();
+        this.tamu = tamu;
+        String[] kolom = {"Nama Tamu", "NOPOL Kendaraan", "Tujuan Tamu", "Waktu Kedatangan", "Durasi (Jam)"};
+        tamu.setColumnIdentifiers(kolom);
+        tableDataTamu.setModel(tamu);
+
+        //koneksi button Tambah Data ke Frame Tambah Tamu
+        btnTambahData.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            new TambahTamuFrame(tamu).setVisible(true);
+    }
+});
+
     }
 
     /**

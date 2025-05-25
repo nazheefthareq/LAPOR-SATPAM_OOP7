@@ -3,18 +3,26 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package LaporSatpam;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author USER
  */
 public class TambahTamuFrame extends javax.swing.JFrame {
+    private DefaultTableModel tableModel;
 
     /**
      * Creates new form TambahTamuFrame
      */
     public TambahTamuFrame() {
         initComponents();
+    }
+    
+    public TambahTamuFrame(DefaultTableModel tamu) {
+        initComponents();
+        this.tableModel = tamu;
     }
 
     /**
@@ -72,6 +80,11 @@ public class TambahTamuFrame extends javax.swing.JFrame {
         btnSimpan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnSimpan.setForeground(new java.awt.Color(98, 150, 232));
         btnSimpan.setText("Simpan Data");
+        btnSimpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSimpanActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -140,6 +153,22 @@ public class TambahTamuFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
+        String nama = tfNamaTamu.getText();
+        String nopol = tfNopolTamu.getText();
+
+        if (nama.isEmpty() || nopol.isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+                "Tolong Isi Semua Data!",
+                "Data Belum Terisi!",
+                JOptionPane.ERROR_MESSAGE);
+        } else {
+            Object[] rowData = { nama, nopol };
+            tableModel.addRow(rowData);
+            dispose(); // menutup frame TambahTamu setelah berhasil simpan
+            }
+    }//GEN-LAST:event_btnSimpanActionPerformed
 
     /**
      * @param args the command line arguments
