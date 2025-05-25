@@ -64,6 +64,11 @@ public class MainFrame extends javax.swing.JFrame {
 
         btnFotoKTP.setForeground(new java.awt.Color(98, 150, 232));
         btnFotoKTP.setText("Ambil Foto KTP");
+        btnFotoKTP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFotoKTPActionPerformed(evt);
+            }
+        });
 
         tableDataTamu.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -89,7 +94,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(12, 12, 12)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnTambahData, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                            .addComponent(btnTambahData, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnFotoKTP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 610, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -124,6 +129,11 @@ public class MainFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnFotoKTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFotoKTPActionPerformed
+        new FotoKTP().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnFotoKTPActionPerformed
 
     /**
      * @param args the command line arguments

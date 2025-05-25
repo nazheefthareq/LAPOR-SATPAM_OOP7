@@ -10,4 +10,16 @@
         <maven.compiler.release>23</maven.compiler.release>
         <exec.mainClass>LaporSatpam.MainFrame</exec.mainClass>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.sarxos</groupId>
+            <artifactId>webcam-capture</artifactId>
+            <version>0.3.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv-platform</artifactId>
+            <version>1.5.10</version>
+        </dependency>
+    </dependencies>
 </project>
