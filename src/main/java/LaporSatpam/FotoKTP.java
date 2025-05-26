@@ -79,8 +79,12 @@ public class FotoKTP extends javax.swing.JFrame {
 
             JOptionPane.showMessageDialog(this, "Foto berhasil disimpan di:\n" + filename);
             
-            Text1.setText("");
-            Text2.setText("");
+             if (webcam.isOpen()) {
+                webcam.close();
+            }
+             
+            new MainFrame().setVisible(true); 
+                this.dispose();
 
         } catch (Exception ex) {
             ex.printStackTrace();
