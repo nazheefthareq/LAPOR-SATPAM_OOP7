@@ -53,44 +53,49 @@ public class FotoKTP extends javax.swing.JFrame {
     }
     
     private void captureButtonActionPerformed(ActionEvent e) {
-        String nama = Text1.getText().trim();
-        String blok = Text2.getText().trim();
+    String nama = Text1.getText().trim();
+    String blok = Text2.getText().trim();
 
-        if (nama.isEmpty() || blok.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nama dan Blok tidak boleh kosong.");
-            return;
-        }
-        
-        if (!blok.matches("[A-Za-z]{2}/\\d{2}")) {
-            JOptionPane.showMessageDialog(this, "Format Blok salah! Gunakan format seperti: AB/12", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            var image = webcam.getImage();
-
-            File folder = new File("Foto_KTP_Tamu");
-            if (!folder.exists()) folder.mkdir();
-
-            String timestamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
-            String filename = String.format("Foto_KTP_Tamu/%s_%s_%s.jpg", nama, blok.replace("/", "_"), timestamp);
-
-            ImageIO.write(image, "JPG", new File(filename));
-
-            JOptionPane.showMessageDialog(this, "Foto berhasil disimpan di:\n" + filename);
-            
-             if (webcam.isOpen()) {
-                webcam.close();
-            }
-             
-            new MainFrame().setVisible(true); 
-                this.dispose();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Gagal menyimpan foto: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+    if (nama.isEmpty() || blok.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Nama dan Blok tidak boleh kosong.");
+        return;
     }
+
+    if (!blok.matches("[A-Za-z]{2}/\\d{2}")) {
+        JOptionPane.showMessageDialog(this, "Format Blok salah! Gunakan format seperti: AB/12", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    try {
+        var image = webcam.getImage();
+
+        if (webcam.isOpen()) webcam.close();
+
+        PreviewFoto preview = new PreviewFoto(image, nama, blok, () -> {
+            try {
+                File folder = new File("Foto_KTP_Tamu");
+                if (!folder.exists()) folder.mkdir();
+
+                String timestamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
+                String filename = String.format("Foto_KTP_Tamu/%s_%s_%s.jpg", nama, blok.replace("/", "_"), timestamp);
+                ImageIO.write(image, "JPG", new File(filename));
+                JOptionPane.showMessageDialog(null, "Foto berhasil disimpan di:\n" + filename);
+                new MainFrame().setVisible(true);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Gagal menyimpan foto: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        preview.setVisible(true);
+        this.dispose();
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Gagal menangkap gambar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
