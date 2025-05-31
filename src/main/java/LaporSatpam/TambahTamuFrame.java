@@ -10,8 +10,12 @@ import javax.swing.*;
 import java.awt.event.*;
 import LaporSatpam.HitungMundur;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
 import javax.swing.table.DefaultTableModel;
+import java.time.LocalTime;
 
 
 /**
@@ -51,8 +55,6 @@ public class TambahTamuFrame extends javax.swing.JFrame {
         tfNopolTamu = new javax.swing.JTextField();
         labelTujuanTamu = new javax.swing.JLabel();
         tfTujuanTamu = new javax.swing.JTextField();
-        LabelTamuDatang = new javax.swing.JLabel();
-        spinnerDatang = new javax.swing.JSpinner();
         labelDurasiTamu = new javax.swing.JLabel();
         spinnerDurasi = new javax.swing.JSpinner();
         btnSimpan = new javax.swing.JButton();
@@ -84,10 +86,6 @@ public class TambahTamuFrame extends javax.swing.JFrame {
         labelTujuanTamu.setForeground(new java.awt.Color(255, 255, 255));
         labelTujuanTamu.setText("Tujuan Tamu");
 
-        LabelTamuDatang.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        LabelTamuDatang.setForeground(new java.awt.Color(255, 255, 255));
-        LabelTamuDatang.setText("Waktu Kedatangan Tamu");
-
         labelDurasiTamu.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         labelDurasiTamu.setForeground(new java.awt.Color(255, 255, 255));
         labelDurasiTamu.setText("Durasi Menetap Tamu");
@@ -118,9 +116,7 @@ public class TambahTamuFrame extends javax.swing.JFrame {
                     .addComponent(tfNopolTamu)
                     .addComponent(labelTujuanTamu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tfTujuanTamu)
-                    .addComponent(LabelTamuDatang, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                    .addComponent(spinnerDatang)
-                    .addComponent(labelDurasiTamu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelDurasiTamu, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
                     .addComponent(spinnerDurasi)
                     .addComponent(btnSimpan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(39, Short.MAX_VALUE))
@@ -142,15 +138,11 @@ public class TambahTamuFrame extends javax.swing.JFrame {
                 .addComponent(labelTujuanTamu)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tfTujuanTamu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(LabelTamuDatang)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(spinnerDatang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(labelDurasiTamu)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(spinnerDurasi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(54, 54, 54)
+                .addGap(110, 110, 110)
                 .addComponent(btnSimpan, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(65, Short.MAX_VALUE))
         );
@@ -168,52 +160,87 @@ public class TambahTamuFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    private void loadTableData() {
+            try {
+                // Kosongkan isi tabel dulu
+                tableModel.setRowCount(0);
 
-    private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-        String nama = tfNamaTamu.getText();
-        String nopol = tfNopolTamu.getText();
-         String tujuan = tfTujuanTamu.getText();
-         Object waktuDatang = spinnerDatang.getValue();
-         int durasi = (Integer) spinnerDurasi.getValue(); 
-
-        if (nama.isEmpty() || nopol.isEmpty() || tujuan.isEmpty()) {
-        JOptionPane.showMessageDialog(this,
-                "Tolong Isi Semua Data!",
-                "Data Belum Terisi!",
-                JOptionPane.ERROR_MESSAGE);
-        } 
-        try {
-            String sql = "INSERT INTO tamu (nama, nopol, tujuan, waktu_datang, durasi) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, nama);
-            stmt.setString(2, nopol);
-            stmt.setString(3, tujuan);
-            stmt.setObject(4, waktuDatang); // pastikan tipe sesuai dengan kolom waktu_datang di DB
-            stmt.setInt(5, durasi);
-
-            int rowsInserted = stmt.executeUpdate();
-            if (rowsInserted > 0) {
+                // Query data tamu dari database
+                String query = "SELECT * FROM tamu";
+                try (Statement stmt = conn.createStatement() // <--- menggunakan conn
+;               ResultSet rs = stmt.executeQuery(query)                ) {
+                    
+                    // Tambahkan data ke tableModel
+                    while (rs.next()) {
+                        String nama = rs.getString("nama");
+                        String nopol = rs.getString("nopol");
+                        String tujuan = rs.getString("tujuan");
+                        Time waktuDatang = rs.getTime("waktu_datang");
+                        Time durasi = rs.getTime("durasi");
+                        
+                        Object[] rowData = { nama, nopol, tujuan, waktuDatang.toString(), durasi };
+                        tableModel.addRow(rowData);
+                    }
+                    
+                }
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this,
-                    "Data tamu berhasil ditambahkan ke database.",
-                    "Sukses",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-                Object[] rowData = { nama, nopol, tujuan, waktuDatang, durasi };
-                tableModel.addRow(rowData);
-                HitungMundur.mulaiCountdown(nama, nopol, durasi);
-                dispose(); // menutup frame setelah simpan
-            } else {
-                JOptionPane.showMessageDialog(this,
-                    "Gagal menambahkan data ke database.",
-                    "Gagal",
+                    "Gagal memuat data tabel: " + ex.getMessage(),
+                    "Error",
                     JOptionPane.ERROR_MESSAGE);
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this,
-                "Terjadi kesalahan saat menyimpan ke database: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
         }
+
+    private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
+            String nama = tfNamaTamu.getText();
+            String nopol = tfNopolTamu.getText();
+            String tujuan = tfTujuanTamu.getText();
+            int durasi = (Integer) spinnerDurasi.getValue();
+
+            LocalTime now = LocalTime.now().withNano(0); 
+            java.sql.Time waktuDatang = java.sql.Time.valueOf(now); 
+
+            if (nama.isEmpty() || nopol.isEmpty() || tujuan.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "Tolong Isi Semua Data!",
+                    "Data Belum Terisi!",
+                    JOptionPane.ERROR_MESSAGE);
+                return; 
+            }
+
+            try {
+                String sql = "INSERT INTO tamu (nama, nopol, tujuan, waktu_datang, durasi) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setString(1, nama);
+                stmt.setString(2, nopol);
+                stmt.setString(3, tujuan);
+                stmt.setTime(4, waktuDatang); 
+                stmt.setInt(5, durasi);
+
+                int rowsInserted = stmt.executeUpdate();
+                if (rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(this,
+                        "Data tamu berhasil ditambahkan ke database.",
+                        "Sukses",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                    
+                    loadTableData();
+
+                    
+                    HitungMundur.mulaiCountdown(nama, nopol, durasi);
+                    dispose(); 
+                    JOptionPane.showMessageDialog(this,
+                        "Gagal menambahkan data ke database.",
+                        "Gagal",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this,
+                    "Terjadi kesalahan saat menyimpan ke database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
 
         
     }//GEN-LAST:event_btnSimpanActionPerformed
@@ -258,7 +285,6 @@ public class TambahTamuFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel LabelTamuDatang;
     private javax.swing.JButton btnSimpan;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel labelDurasiTamu;
@@ -266,7 +292,6 @@ public class TambahTamuFrame extends javax.swing.JFrame {
     private javax.swing.JLabel labelNama;
     private javax.swing.JLabel labelNopolTamu;
     private javax.swing.JLabel labelTujuanTamu;
-    private javax.swing.JSpinner spinnerDatang;
     private javax.swing.JSpinner spinnerDurasi;
     private javax.swing.JTextField tfNamaTamu;
     private javax.swing.JTextField tfNopolTamu;
