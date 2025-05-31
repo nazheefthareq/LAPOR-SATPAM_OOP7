@@ -7,25 +7,30 @@ package ConnectionDB;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import javax.swing.JOptionPane;
 /**
  *
  * @author PC WILDAN
  */
 public class DatabaseConn {
-     public static Connection conn = null;
+    public static Connection conn = null;
 
-    // Ubah nama method jadi connectDB
-    public static void connectDB() {
-        String url = "jdbc:mysql://localhost:3306/lapor_satpam";
-        String user = "root";
-        String password = "";
+    public static Connection connectDB() {
+        if (conn == null) {
+            String url = "jdbc:mysql://localhost:3306/lapor_satpam";
+            String user = "root";
+            String password = "";
 
-        try {
-            conn = DriverManager.getConnection(url, user, password);
-            JOptionPane.showMessageDialog(null, "Koneksi berhasil!");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Koneksi gagal: " + e.getMessage());
+            try {
+                conn = DriverManager.getConnection(url, user, password);
+                System.out.println("Koneksi ke database berhasil.");
+            } catch (SQLException e) {
+                System.err.println("Koneksi gagal: " + e.getMessage());
+            }
         }
+        return conn;
+    }
+    
+    public static Connection getConnection() {
+        return connectDB(); // Pastikan selalu mengembalikan koneksi aktif
     }
 }

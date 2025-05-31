@@ -230,10 +230,7 @@ public class TambahTamuFrame extends javax.swing.JFrame {
                     
                     HitungMundur.mulaiCountdown(nama, nopol, durasi);
                     dispose(); 
-                    JOptionPane.showMessageDialog(this,
-                        "Gagal menambahkan data ke database.",
-                        "Gagal",
-                        JOptionPane.ERROR_MESSAGE);
+                   
                 }
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this,
