@@ -53,14 +53,14 @@ public class MainFrame extends javax.swing.JFrame {
                     String nopol = rs.getString("nopol");
                     String tujuan = rs.getString("tujuan");
                     Time waktuDatang = rs.getTime("waktu_datang");
-                    Time durasi = rs.getTime("durasi");
+                    int durasi = rs.getInt("durasi"); // <--- DIUBAH MENJADI getInt()
 
                     Object[] rowData = {
                         nama,
                         nopol,
                         tujuan,
                         waktuDatang.toLocalTime().toString(),
-                        durasi.toLocalTime().toString()
+                        durasi // <--- DIUBAH, LANGSUNG PAKAI VARIABEL durasi
                     };
                     tamu.addRow(rowData);
                 }
