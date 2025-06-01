@@ -9,6 +9,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.table.TableRowSorter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import javax.swing.JFileChooser;
 
 
 /**
@@ -54,11 +58,9 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
 // ===== KODE BARU UNTUK FITUR PENCARIAN (SELESAI) =====
 
         //koneksi button Tambah Data ke Frame Tambah Tamu
-        btnTambahData.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnTambahData.addActionListener((java.awt.event.ActionEvent evt) -> {
             new TambahTamuFrame(tamu).setVisible(true);
-    }
-});
+        });
 
     }
     private void loadTableData() {
@@ -114,6 +116,7 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
         jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         tfSearch = new javax.swing.JTextField();
+        btnExport = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -159,6 +162,13 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Cari Tamu");
 
+        btnExport.setText("Export ke CSV");
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -177,7 +187,8 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnTambahData, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnFotoKTP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btnFotoKTP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 610, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(25, Short.MAX_VALUE))
@@ -194,11 +205,15 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(25, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnTambahData, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(btnFotoKTP, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                        .addComponent(btnFotoKTP, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(92, 92, 92))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -223,6 +238,59 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         loadTableData();  // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        // 1. Membuka dialog untuk memilih lokasi penyimpanan file
+JFileChooser fileChooser = new JFileChooser();
+fileChooser.setDialogTitle("Simpan Laporan sebagai CSV");
+// Filter agar hanya menampilkan opsi .csv
+fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV File (*.csv)", "csv"));
+
+int userSelection = fileChooser.showSaveDialog(this);
+
+if (userSelection == JFileChooser.APPROVE_OPTION) {
+    File fileToSave = fileChooser.getSelectedFile();
+    // Memastikan file yang disimpan memiliki ekstensi .csv
+    if (!fileToSave.getAbsolutePath().endsWith(".csv")) {
+        fileToSave = new File(fileToSave.getAbsolutePath() + ".csv");
+    }
+
+    // 2. Proses menulis data ke dalam file CSV
+    try (FileWriter csvWriter = new FileWriter(fileToSave)) {
+        // Menulis baris header (judul kolom)
+        csvWriter.append("ID,Nama Tamu,NOPOL Kendaraan,Tujuan,Waktu Kedatangan,Durasi (Menit)\n");
+
+        // 3. Mengambil semua data dari database
+        Connection conn = DatabaseConn.connectDB();
+        String query = "SELECT * FROM tamu";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            // 4. Menulis setiap baris data tamu ke file
+            while (rs.next()) {
+                csvWriter.append(rs.getString("id"));
+                csvWriter.append(",");
+                csvWriter.append(rs.getString("nama"));
+                csvWriter.append(",");
+                csvWriter.append(rs.getString("nopol"));
+                csvWriter.append(",");
+                csvWriter.append(rs.getString("tujuan"));
+                csvWriter.append(",");
+                csvWriter.append(rs.getTime("waktu_datang").toString());
+                csvWriter.append(",");
+                csvWriter.append(String.valueOf(rs.getInt("durasi")));
+                csvWriter.append("\n");
+            }
+        }
+
+        csvWriter.flush(); // Memastikan semua data tertulis
+        JOptionPane.showMessageDialog(this, "Data berhasil diekspor ke:\n" + fileToSave.getAbsolutePath(), "Ekspor Berhasil", JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (IOException | SQLException e) {
+        JOptionPane.showMessageDialog(this, "Gagal mengekspor data: " + e.getMessage(), "Error Ekspor", JOptionPane.ERROR_MESSAGE);
+    }
+}// TODO add your handling code here:
+    }//GEN-LAST:event_btnExportActionPerformed
 
     /**
      * @param args the command line arguments
@@ -252,14 +320,13 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainFrame().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnFotoKTP;
     private javax.swing.JButton btnTambahData;
     private javax.swing.JButton jButton1;
