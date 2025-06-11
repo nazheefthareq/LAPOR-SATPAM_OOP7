@@ -28,7 +28,13 @@ public class TambahTamuFrame extends javax.swing.JFrame {
     /**
      * Creates new form TambahTamuFrame
      */
-    public TambahTamuFrame() {
+    public TambahTamuFrame(String nama) {
+        initComponents();
+        DatabaseConn.connectDB();
+        tfNamaTamu.setText(nama);
+    }
+    
+    public TambahTamuFrame(){
         initComponents();
         DatabaseConn.connectDB();
     }
@@ -192,54 +198,52 @@ public class TambahTamuFrame extends javax.swing.JFrame {
         }
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-            String nama = tfNamaTamu.getText();
-            String nopol = tfNopolTamu.getText();
-            String tujuan = tfTujuanTamu.getText();
-            int durasi = (Integer) spinnerDurasi.getValue();
+    String nama = tfNamaTamu.getText();
+    String nopol = tfNopolTamu.getText();
+    String tujuan = tfTujuanTamu.getText();
+    int durasi = (Integer) spinnerDurasi.getValue();
 
-            LocalTime now = LocalTime.now().withNano(0); 
-            java.sql.Time waktuDatang = java.sql.Time.valueOf(now); 
+    LocalTime now = LocalTime.now().withNano(0); 
+    java.sql.Time waktuDatang = java.sql.Time.valueOf(now); 
 
-            if (nama.isEmpty() || nopol.isEmpty() || tujuan.isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                    "Tolong Isi Semua Data!",
-                    "Data Belum Terisi!",
-                    JOptionPane.ERROR_MESSAGE);
-                return; 
-            }
+    if (nama.isEmpty() || nopol.isEmpty() || tujuan.isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+            "Tolong Isi Semua Data!",
+            "Data Belum Terisi!",
+            JOptionPane.ERROR_MESSAGE);
+        return; 
+    }
 
-            try {
-                String sql = "INSERT INTO tamu (nama, nopol, tujuan, waktu_datang, durasi) VALUES (?, ?, ?, ?, ?)";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setString(1, nama);
-                stmt.setString(2, nopol);
-                stmt.setString(3, tujuan);
-                stmt.setTime(4, waktuDatang); 
-                stmt.setInt(5, durasi);
+    try {
+        String sql = "INSERT INTO tamu (nama, nopol, tujuan, waktu_datang, durasi) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, nama);
+        stmt.setString(2, nopol);
+        stmt.setString(3, tujuan);
+        stmt.setTime(4, waktuDatang); 
+        stmt.setInt(5, durasi);
 
-                int rowsInserted = stmt.executeUpdate();
-                if (rowsInserted > 0) {
-                    JOptionPane.showMessageDialog(this,
-                        "Data tamu berhasil ditambahkan ke database.",
-                        "Sukses",
-                        JOptionPane.INFORMATION_MESSAGE);
+        int rowsInserted = stmt.executeUpdate();
+        if (rowsInserted > 0) {
+            JOptionPane.showMessageDialog(this,
+                "Data tamu berhasil ditambahkan ke database.",
+                "Sukses",
+                JOptionPane.INFORMATION_MESSAGE);
+            
+            HitungMundur.mulaiCountdown(nama, nopol, durasi);
 
-                    
-                    loadTableData();
-
-                    
-                    HitungMundur.mulaiCountdown(nama, nopol, durasi);
-                    dispose(); 
-                   
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this,
-                    "Terjadi kesalahan saat menyimpan ke database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            }
-
-        
+            // Open MainFrame and refresh data
+            MainFrame mainFrame = new MainFrame();
+            mainFrame.loadTableData(); // Load the latest data
+            mainFrame.setVisible(true); // Show the main frame
+            dispose(); // Close the current frame
+        }
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this,
+            "Terjadi kesalahan saat menyimpan ke database: " + ex.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_btnSimpanActionPerformed
 
     private void tfNamaTamuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNamaTamuActionPerformed

@@ -13,6 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
 
 /**
  *
@@ -53,47 +56,31 @@ public class FotoKTP extends javax.swing.JFrame {
     }
     
     private void captureButtonActionPerformed(ActionEvent e) {
-    String nama = Text1.getText().trim();
-    String blok = Text2.getText().trim();
-
-    if (nama.isEmpty() || blok.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Nama dan Blok tidak boleh kosong.");
-        return;
-    }
-
-    if (!blok.matches("[A-Za-z]{2}/\\d{2}")) {
-        JOptionPane.showMessageDialog(this, "Format Blok salah! Gunakan format seperti: AB/12", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
     try {
-        var image = webcam.getImage();
-
-        if (webcam.isOpen()) webcam.close();
-
-        PreviewFoto preview = new PreviewFoto(image, nama, blok, () -> {
-            try {
-                File folder = new File("Foto_KTP_Tamu");
-                if (!folder.exists()) folder.mkdir();
-
-                String timestamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
-                String filename = String.format("Foto_KTP_Tamu/%s_%s_%s.jpg", nama, blok.replace("/", "_"), timestamp);
-                ImageIO.write(image, "JPG", new File(filename));
-                JOptionPane.showMessageDialog(null, "Foto berhasil disimpan di:\n" + filename);
-                new MainFrame().setVisible(true);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Gagal menyimpan foto: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        preview.setVisible(true);
-        this.dispose();
-
-    } catch (Exception ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Gagal menangkap gambar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    }
+            var image = webcam.getImage();
+            if (webcam.isOpen()) webcam.close();
+            // Save the captured image
+            File folder = new File("Foto_KTP_Tamu");
+            if (!folder.exists()) folder.mkdir();
+            String timestamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
+            String filename = String.format("Foto_KTP_Tamu/_%s.jpg", timestamp);
+            ImageIO.write(image, "JPG", new File(filename));
+            JOptionPane.showMessageDialog(null, "Foto berhasil disimpan di:\n" + filename);
+            // Perform OCR on the saved image
+            ITesseract tesseract = new Tesseract();
+            tesseract.setDatapath("C:\\Users\\PC WILDAN\\OneDrive\\Dokumen\\NetBeansProjects\\LAPOR-SATPAM_OOP7\\Tess4J\\tessdata"); // Set the path to your tessdata folder
+            tesseract.setLanguage("ind"); // Use "ind" for Indonesian language
+            PreviewFoto preview = new PreviewFoto(image,() -> {
+            // Save image logic here
+            }, tesseract);
+            
+            preview.setVisible(true);
+            this.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Gagal menangkap gambar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
 }
+
 
 
 
@@ -108,10 +95,6 @@ public class FotoKTP extends javax.swing.JFrame {
 
         Background = new javax.swing.JPanel();
         WebcamContain = new javax.swing.JPanel();
-        Label1 = new javax.swing.JLabel();
-        Label2 = new javax.swing.JLabel();
-        Text1 = new javax.swing.JTextField();
-        Text2 = new javax.swing.JTextField();
         Capture = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -122,16 +105,12 @@ public class FotoKTP extends javax.swing.JFrame {
         WebcamContain.setLayout(WebcamContainLayout);
         WebcamContainLayout.setHorizontalGroup(
             WebcamContainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 681, Short.MAX_VALUE)
         );
         WebcamContainLayout.setVerticalGroup(
             WebcamContainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 469, Short.MAX_VALUE)
         );
-
-        Label1.setText("Nama :");
-
-        Label2.setText("Blok :");
 
         Capture.setText("Ambil Gambar");
 
@@ -144,17 +123,9 @@ public class FotoKTP extends javax.swing.JFrame {
                 .addComponent(WebcamContain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(BackgroundLayout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(Label1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Text1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(Label2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Text2, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(271, 271, 271)
                 .addComponent(Capture, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(44, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         BackgroundLayout.setVerticalGroup(
             BackgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,12 +133,7 @@ public class FotoKTP extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(WebcamContain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(BackgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Label1)
-                    .addComponent(Label2)
-                    .addComponent(Text1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Text2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Capture, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(Capture, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(25, Short.MAX_VALUE))
         );
 
@@ -223,10 +189,6 @@ public class FotoKTP extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Background;
     private javax.swing.JButton Capture;
-    private javax.swing.JLabel Label1;
-    private javax.swing.JLabel Label2;
-    private javax.swing.JTextField Text1;
-    private javax.swing.JTextField Text2;
     private javax.swing.JPanel WebcamContain;
     // End of variables declaration//GEN-END:variables
 }

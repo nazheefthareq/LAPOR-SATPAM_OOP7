@@ -63,7 +63,7 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
         });
 
     }
-    private void loadTableData() {
+    public void loadTableData() {
         try {
             // Kosongkan isi tabel
             tamu.setRowCount(0);
@@ -268,7 +268,7 @@ if (userSelection == JFileChooser.APPROVE_OPTION) {
 
             // 4. Menulis setiap baris data tamu ke file
             while (rs.next()) {
-                csvWriter.append(rs.getString("id"));
+                csvWriter.append(rs.getString("id_tamu"));
                 csvWriter.append(",");
                 csvWriter.append(rs.getString("nama"));
                 csvWriter.append(",");

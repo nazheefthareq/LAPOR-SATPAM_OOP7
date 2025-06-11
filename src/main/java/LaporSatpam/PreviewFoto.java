@@ -8,6 +8,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.TesseractException;
 
 
 /**
@@ -16,43 +18,71 @@ import javax.swing.JOptionPane;
  */
 public class PreviewFoto extends javax.swing.JFrame {
     private BufferedImage capturedImage;
-    private String nama;
-    private String blok;
     private Runnable onSave;
 
     /**
      * Creates new form PreviewFoto
      */
-    public PreviewFoto(BufferedImage image, String nama, String blok, Runnable onSave) {
-        initComponents();
-        this.capturedImage = image;
-        this.nama = nama;
-        this.blok = blok;
-        this.onSave = onSave;
-        
-        JLabel label = new JLabel(new ImageIcon(image));
-        PhotoReview.setLayout(new BorderLayout());
-        PhotoReview.add(label, BorderLayout.CENTER);
-        PhotoReview.revalidate();
-        PhotoReview.repaint();
-
-        LabelQuestion.setText("Yakin simpan foto untuk " + nama + " (" + blok + ")?");
-
-        ButtonSimpan.addActionListener(e -> {
-            System.out.println("Button Simpan diklik");
-            if (onSave != null) {
-                onSave.run();
-            } else {
-                JOptionPane.showMessageDialog(this, "onSave tidak diset!");
-            }
-            this.dispose();
-        });
-
-        ButtonRetake.addActionListener(e -> {
-            new FotoKTP().setVisible(true);
-            this.dispose();
-        });
+    public PreviewFoto(BufferedImage image, Runnable onSave, ITesseract ocrProcessor) {
+    initComponents();
+    this.capturedImage = image;
+    this.onSave = onSave;
+    
+    JLabel label = new JLabel(new ImageIcon(image));
+    PhotoReview.setLayout(new BorderLayout());
+    PhotoReview.add(label, BorderLayout.CENTER);
+    PhotoReview.revalidate();
+    PhotoReview.repaint();
+    LabelQuestion.setText("Yakin simpan foto?");
+    ButtonSimpan.addActionListener(e -> {
+    System.out.println("Button Simpan diklik");
+    if (onSave != null) {
+        onSave.run();
+    } else {
+        JOptionPane.showMessageDialog(this, "onSave tidak diset!");
     }
+
+    // Perform OCR on the captured image
+    String extractedText = performOCR(capturedImage, ocrProcessor);
+    String namaDariOCR = extractNamaFromOCR(extractedText);
+    JOptionPane.showMessageDialog(this, "Hasil OCR:\n" + extractedText + "\n\nNama yang diparsing: " + namaDariOCR);
+
+    // Open TambahTamuFrame with the extracted name
+    TambahTamuFrame tambahTamuFrame = new TambahTamuFrame(namaDariOCR);
+    tambahTamuFrame.setVisible(true);
+    this.dispose();
+});
+
+    ButtonRetake.addActionListener(e -> {
+        new FotoKTP().setVisible(true);
+        this.dispose();
+    });
+}
+    
+    private String performOCR(BufferedImage image, ITesseract ocrProcessor) {
+    try {
+        return ocrProcessor.doOCR(image);
+    } catch (TesseractException e) {
+        e.printStackTrace();
+        return "Gagal melakukan OCR: " + e.getMessage();
+    }
+}
+
+private String extractNamaFromOCR(String ocrText) {
+    String[] lines = ocrText.split("\\r?\\n");  // Split text by lines
+
+    for (String line : lines) {
+        line = line.trim();
+        if (line.toLowerCase().startsWith("nama")) {
+            String nameValue = line.replaceAll("(?i)nama[:\\s]*", "").trim();
+            if (!nameValue.isEmpty()) {
+                return nameValue;
+            }
+        }
+    }
+    return "Nama tidak ditemukan";
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
