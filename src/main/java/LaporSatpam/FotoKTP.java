@@ -68,7 +68,7 @@ public class FotoKTP extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Foto berhasil disimpan di:\n" + filename);
             // Perform OCR on the saved image
             ITesseract tesseract = new Tesseract();
-            tesseract.setDatapath("C:\\Users\\PC WILDAN\\OneDrive\\Dokumen\\NetBeansProjects\\LAPOR-SATPAM_OOP7\\Tess4J\\tessdata"); // Set the path to your tessdata folder
+            tesseract.setDatapath("tessdata"); // Set the path to your tessdata folder
             tesseract.setLanguage("ind"); // Use "ind" for Indonesian language
             PreviewFoto preview = new PreviewFoto(image,() -> {
             // Save image logic here
