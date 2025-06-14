@@ -1,5 +1,8 @@
 package LaporSatpam;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,6 +26,8 @@ public class HitungMundur {
                 } else {
                     timer.cancel();
                     System.out.println("Waktu habis, akan muncul popup reminder!");
+                    
+                    updateStatusSelesai(namaTamu, nopol);
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(null,
                                 "Waktu menetap tamu " + namaTamu + " [" + nopol + "] telah habis!",
@@ -34,5 +39,18 @@ public class HitungMundur {
         };
 
         timer.scheduleAtFixedRate(task, 0, 1000);
+    }
+    
+    private static void updateStatusSelesai(String namaTamu, String nopol) {
+        Connection conn = ConnectionDB.DatabaseConn.connectDB();
+        String updateQuery = "UPDATE tamu SET status='selesai' WHERE nama = ? AND nopol = ? AND status='menunggu'";
+        try (PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+            pstmt.setString(1, namaTamu);
+            pstmt.setString(2, nopol);
+            int rows = pstmt.executeUpdate();
+            System.out.println("Update status selesai, baris terpengaruh: " + rows);
+        } catch (SQLException e) {
+            System.err.println("Gagal update status selesai: " + e.getMessage());
+        }
     }
 }

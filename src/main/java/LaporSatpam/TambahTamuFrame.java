@@ -166,36 +166,6 @@ public class TambahTamuFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    private void loadTableData() {
-            try {
-                // Kosongkan isi tabel dulu
-                tableModel.setRowCount(0);
-
-                // Query data tamu dari database
-                String query = "SELECT * FROM tamu";
-                try (Statement stmt = conn.createStatement() // <--- menggunakan conn
-;               ResultSet rs = stmt.executeQuery(query)                ) {
-                    
-                    // Tambahkan data ke tableModel
-                    while (rs.next()) {
-                        String nama = rs.getString("nama");
-                        String nopol = rs.getString("nopol");
-                        String tujuan = rs.getString("tujuan");
-                        Time waktuDatang = rs.getTime("waktu_datang");
-                        Time durasi = rs.getTime("durasi");
-                        
-                        Object[] rowData = { nama, nopol, tujuan, waktuDatang.toString(), durasi };
-                        tableModel.addRow(rowData);
-                    }
-                    
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this,
-                    "Gagal memuat data tabel: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            }
-        }
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
     String nama = tfNamaTamu.getText();
@@ -204,7 +174,8 @@ public class TambahTamuFrame extends javax.swing.JFrame {
     int durasi = (Integer) spinnerDurasi.getValue();
 
     LocalTime now = LocalTime.now().withNano(0); 
-    java.sql.Time waktuDatang = java.sql.Time.valueOf(now); 
+    java.sql.Time waktuDatang = java.sql.Time.valueOf(now);
+    java.sql.Date tanggal = new java.sql.Date(System.currentTimeMillis());
 
     if (nama.isEmpty() || nopol.isEmpty() || tujuan.isEmpty()) {
         JOptionPane.showMessageDialog(this,
@@ -215,13 +186,15 @@ public class TambahTamuFrame extends javax.swing.JFrame {
     }
 
     try {
-        String sql = "INSERT INTO tamu (nama, nopol, tujuan, waktu_datang, durasi) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tamu (nama, nopol, tujuan, waktu_datang, durasi, tanggal, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, nama);
         stmt.setString(2, nopol);
         stmt.setString(3, tujuan);
         stmt.setTime(4, waktuDatang); 
         stmt.setInt(5, durasi);
+        stmt.setDate(6, tanggal); // Set the current date
+        stmt.setString(7, "menunggu"); // Initial status
 
         int rowsInserted = stmt.executeUpdate();
         if (rowsInserted > 0) {

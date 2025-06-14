@@ -31,7 +31,7 @@ public class MainFrame extends javax.swing.JFrame {
         
          //menampilkan data Tamu pada Tabel Data Tamu di Main Frame
         this.tamu = new DefaultTableModel();
-        String[] kolom = {"Nama Tamu", "NOPOL Kendaraan", "Tujuan Tamu", "Waktu Kedatangan", "Durasi (Menit)"};
+        String[] kolom = {"Nama Tamu", "NOPOL Kendaraan", "Tujuan Tamu", "Tanggal", "Waktu Kedatangan", "Durasi (Menit)", "Status"};
         tamu.setColumnIdentifiers(kolom);
         tableDataTamu.setModel(tamu);
         // ===== KODE BARU UNTUK FITUR PENCARIAN (MULAI) =====
@@ -60,6 +60,7 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
         //koneksi button Tambah Data ke Frame Tambah Tamu
         btnTambahData.addActionListener((java.awt.event.ActionEvent evt) -> {
             new TambahTamuFrame(tamu).setVisible(true);
+            this.dispose();
         });
 
     }
@@ -78,15 +79,19 @@ tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
                     String nama = rs.getString("nama");
                     String nopol = rs.getString("nopol");
                     String tujuan = rs.getString("tujuan");
+                    Date tanggal = rs.getDate("tanggal");
                     Time waktuDatang = rs.getTime("waktu_datang");
-                    int durasi = rs.getInt("durasi"); // <--- DIUBAH MENJADI getInt()
+                    int durasi = rs.getInt("durasi");
+                    String status = rs.getString("status");
 
                     Object[] rowData = {
                         nama,
                         nopol,
                         tujuan,
+                        tanggal,
                         waktuDatang.toLocalTime().toString(),
-                        durasi // <--- DIUBAH, LANGSUNG PAKAI VARIABEL durasi
+                        durasi,
+                        status
                     };
                     tamu.addRow(rowData);
                 }
@@ -258,7 +263,7 @@ if (userSelection == JFileChooser.APPROVE_OPTION) {
     // 2. Proses menulis data ke dalam file CSV
     try (FileWriter csvWriter = new FileWriter(fileToSave)) {
         // Menulis baris header (judul kolom)
-        csvWriter.append("ID,Nama Tamu,NOPOL Kendaraan,Tujuan,Waktu Kedatangan,Durasi (Menit)\n");
+        csvWriter.append("ID,Nama Tamu,NOPOL Kendaraan,Tujuan,Tanggal,Waktu Kedatangan,Durasi (Menit)\n");
 
         // 3. Mengambil semua data dari database
         Connection conn = DatabaseConn.connectDB();
@@ -275,6 +280,8 @@ if (userSelection == JFileChooser.APPROVE_OPTION) {
                 csvWriter.append(rs.getString("nopol"));
                 csvWriter.append(",");
                 csvWriter.append(rs.getString("tujuan"));
+                csvWriter.append(",");
+                csvWriter.append(rs.getDate("tanggal").toString());
                 csvWriter.append(",");
                 csvWriter.append(rs.getTime("waktu_datang").toString());
                 csvWriter.append(",");

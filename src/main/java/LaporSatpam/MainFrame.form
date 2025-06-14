@@ -38,7 +38,6 @@
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="e8" green="96" red="62" type="rgb"/>
         </Property>
-<Property name="toolTiptext" type="java.lang.String" value=""/>
       </Properties>
 
       <Layout>
