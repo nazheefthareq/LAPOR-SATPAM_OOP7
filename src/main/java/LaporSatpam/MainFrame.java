@@ -7,7 +7,8 @@ import ConnectionDB.DatabaseConn;
 import java.sql.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
-
+import javax.swing.RowFilter;
+import javax.swing.table.TableRowSorter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
