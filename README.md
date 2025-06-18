@@ -1,6 +1,6 @@
 # Lapor Satpam
 Lapor Satpam adalah aplikasi berbasis Java Swing yang dibuat untuk membantu mengelola data tamu yang berkunjung dalam suatu perumahan secara efisien.
-Aplikasi ini menggunakan fitur *OCR* (*Optical Character Recognition*) untuk memindai KTP secara otomatis menggunakan kamera handphone.
+Aplikasi ini menggunakan fitur *OCR* (*Optical Character Recognition*) untuk memindai KTP secara otomatis menggunakan kamera *handphone*.
 
 ## Fitur Utama
 1. Penambahan data tamu: Pengguna dapat menambahkan data pribadi, plat nomor kendaraan, dan durasi berkunjung. 
